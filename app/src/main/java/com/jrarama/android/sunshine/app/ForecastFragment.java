@@ -1,6 +1,5 @@
 package com.jrarama.android.sunshine.app;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -11,8 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
-import java.util.concurrent.ExecutionException;
 
 
 /**
@@ -51,17 +48,18 @@ public class ForecastFragment extends Fragment {
                 R.layout.list_item_forecast,
                 R.id.list_item_forecast_textview
         );
+
+        // We will manually notify the adapter for data change
         forecastAdapter.setNotifyOnChange(false);
 
         ListView view = (ListView) rootView.findViewById(R.id.listview_forecast);
         view.setAdapter(forecastAdapter);
-        populateForecastAdapter();
+
+        fetchForecast("Singapore", FORECAST_DAYS);
         return rootView;
     }
 
-    private void populateForecastAdapter() {
-        String[] forecasts = fetchForecast("Singapore", FORECAST_DAYS);
-
+    private void populateForecastAdapter(String[] forecasts) {
         forecastAdapter.clear();
         for(String item: forecasts) {
             forecastAdapter.add(item);
@@ -69,25 +67,28 @@ public class ForecastFragment extends Fragment {
         forecastAdapter.notifyDataSetChanged();
     }
 
-    private String[] fetchForecast(String q, int days) {
-        AsyncTask<String, Void, String[]> task = new FetchWeatherTask().execute(q, days + "");
-        try {
-            String[] result = task.get();
-            return result;
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-
-        return null;
+    private void fetchForecast(String q, int days) {
+        new WeatherFetcher().execute(q, days + "");
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_refresh) {
-            populateForecastAdapter();
+            fetchForecast("Singapore", FORECAST_DAYS);
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Instead of putting the big FetchWeatherTask,
+     * just create a subclass that only overrides the required methods
+     **/
+    private class WeatherFetcher extends FetchWeatherTask {
+
+        @Override
+        protected void onPostExecute(String[] strings) {
+            super.onPostExecute(strings);
+            populateForecastAdapter(strings);
+        }
     }
 }
