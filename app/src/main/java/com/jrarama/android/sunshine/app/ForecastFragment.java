@@ -1,5 +1,7 @@
 package com.jrarama.android.sunshine.app;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -8,6 +10,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -41,8 +44,8 @@ public class ForecastFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-
+        final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        final Activity activity = getActivity();
         forecastAdapter = new ArrayAdapter<>(
                 getActivity(),
                 R.layout.list_item_forecast,
@@ -52,8 +55,18 @@ public class ForecastFragment extends Fragment {
         // We will manually notify the adapter for data change
         forecastAdapter.setNotifyOnChange(false);
 
-        ListView view = (ListView) rootView.findViewById(R.id.listview_forecast);
-        view.setAdapter(forecastAdapter);
+        ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
+        listView.setAdapter(forecastAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String text = forecastAdapter.getItem(position);
+                Intent intent = new Intent(activity, DetailActivity.class)
+                        .putExtra(Intent.EXTRA_TEXT, text);
+
+                startActivity(intent);
+            }
+        });
 
         fetchForecast("Singapore", FORECAST_DAYS);
         return rootView;
