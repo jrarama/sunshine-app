@@ -16,6 +16,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import java.util.ArrayList;
+
 
 /**
  * A placeholder fragment containing a simple view.
@@ -51,7 +53,8 @@ public class ForecastFragment extends Fragment {
         forecastAdapter = new ArrayAdapter<>(
                 getActivity(),
                 R.layout.list_item_forecast,
-                R.id.list_item_forecast_textview
+                R.id.list_item_forecast_textview,
+                new ArrayList<String>()
         );
 
         // We will manually notify the adapter for data change
@@ -69,9 +72,13 @@ public class ForecastFragment extends Fragment {
                 startActivity(intent);
             }
         });
-
-        fetchForecast();
         return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        fetchForecast();
     }
 
     private void populateForecastAdapter(String[] forecasts) {
