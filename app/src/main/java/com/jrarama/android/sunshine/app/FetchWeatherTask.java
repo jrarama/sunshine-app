@@ -41,6 +41,14 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
 
         String q = params[0];
         int days = Integer.parseInt(params[1]);
+
+        // set the units
+        if (params.length > 2) {
+            units = params[2];
+        }
+
+        Log.d(TAG, "Location: " + q + ", Units: " + units);
+
         try {
             // Construct the URL for the OpenWeatherMap query
             // Possible parameters are avaiable at OWM's forecast API page, at

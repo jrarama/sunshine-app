@@ -2,7 +2,9 @@ package com.jrarama.android.sunshine.app;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -68,7 +70,7 @@ public class ForecastFragment extends Fragment {
             }
         });
 
-        fetchForecast("Singapore", FORECAST_DAYS);
+        fetchForecast();
         return rootView;
     }
 
@@ -80,14 +82,20 @@ public class ForecastFragment extends Fragment {
         forecastAdapter.notifyDataSetChanged();
     }
 
-    private void fetchForecast(String q, int days) {
-        new WeatherFetcher().execute(q, days + "");
+    private void fetchForecast() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String location = preferences.getString(getString(R.string.settings_location_key),
+                getString(R.string.settings_location_default));
+        String units = preferences.getString(getString(R.string.settings_unit_key),
+                getString(R.string.settings_unit_default));
+
+        new WeatherFetcher().execute(location, FORECAST_DAYS + "", units);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_refresh) {
-            fetchForecast("Singapore", FORECAST_DAYS);
+            fetchForecast();
         }
         return super.onOptionsItemSelected(item);
     }
