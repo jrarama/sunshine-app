@@ -83,8 +83,12 @@ public class ForecastFragment extends Fragment {
 
     private void populateForecastAdapter(String[] forecasts) {
         forecastAdapter.clear();
-        for(String item: forecasts) {
-            forecastAdapter.add(item);
+        if (forecasts == null) {
+            forecastAdapter.add("Unable to get weather for location.");
+        } else {
+            for (String item : forecasts) {
+                forecastAdapter.add(item);
+            }
         }
         forecastAdapter.notifyDataSetChanged();
     }

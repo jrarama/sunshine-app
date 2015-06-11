@@ -90,6 +90,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
                 return null;
             }
             String jsonResult = buffer.toString();
+            Log.d(TAG, "JSON Result: " + jsonResult);
 
             String [] formattedValues = getWeatherDataFromJson(jsonResult, days);
             return formattedValues;
@@ -146,6 +147,8 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
      */
     private String[] getWeatherDataFromJson(String forecastJsonStr, int numDays)
             throws JSONException {
+
+        if (forecastJsonStr == null || forecastJsonStr.length() == 0) return null;
 
         // These are the names of the JSON objects that need to be extracted.
         final String OWM_LIST = "list";
