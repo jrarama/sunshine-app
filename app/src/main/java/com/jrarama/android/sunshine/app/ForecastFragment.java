@@ -24,10 +24,7 @@ import java.util.ArrayList;
  */
 public class ForecastFragment extends Fragment {
 
-    private static final String TAG = ForecastFragment.class.getSimpleName();
-    private static final int FORECAST_DAYS = 7;
-
-    private ArrayAdapter<String> forecastAdapter;
+    private ArrayAdapter<String> mForecastAdapter;
 
     public ForecastFragment() {
     }
@@ -46,11 +43,21 @@ public class ForecastFragment extends Fragment {
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_refresh) {
+            updateWeather();
+
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         final Activity activity = getActivity();
-        forecastAdapter = new ArrayAdapter<>(
+        mForecastAdapter = new ArrayAdapter<>(
                 getActivity(),
                 R.layout.list_item_forecast,
                 R.id.list_item_forecast_textview,
@@ -58,16 +65,16 @@ public class ForecastFragment extends Fragment {
         );
 
         // We will manually notify the adapter for data change
-        forecastAdapter.setNotifyOnChange(false);
+        //mForecastAdapter.setNotifyOnChange(false);
 
         ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
-        listView.setAdapter(forecastAdapter);
+        listView.setAdapter(mForecastAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String text = forecastAdapter.getItem(position);
+                String forecast = mForecastAdapter.getItem(position);
                 Intent intent = new Intent(activity, DetailActivity.class)
-                        .putExtra(Intent.EXTRA_TEXT, text);
+                        .putExtra(Intent.EXTRA_TEXT, forecast);
 
                 startActivity(intent);
             }
@@ -78,49 +85,15 @@ public class ForecastFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        fetchForecast();
+        updateWeather();
     }
 
-    private void populateForecastAdapter(String[] forecasts) {
-        forecastAdapter.clear();
-        if (forecasts == null) {
-            forecastAdapter.add("Unable to get weather for location.");
-        } else {
-            for (String item : forecasts) {
-                forecastAdapter.add(item);
-            }
-        }
-        forecastAdapter.notifyDataSetChanged();
-    }
-
-    private void fetchForecast() {
+    private void updateWeather() {
+        FetchWeatherTask weatherTask = new FetchWeatherTask(getActivity(), mForecastAdapter);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String location = preferences.getString(getString(R.string.settings_location_key),
                 getString(R.string.settings_location_default));
-        String units = preferences.getString(getString(R.string.settings_unit_key),
-                getString(R.string.settings_unit_default));
-
-        new WeatherFetcher().execute(location, FORECAST_DAYS + "", units);
+        weatherTask.execute(location);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_refresh) {
-            fetchForecast();
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * Instead of putting the big FetchWeatherTask,
-     * just create a subclass that only overrides the required methods
-     **/
-    private class WeatherFetcher extends FetchWeatherTask {
-
-        @Override
-        protected void onPostExecute(String[] strings) {
-            super.onPostExecute(strings);
-            populateForecastAdapter(strings);
-        }
-    }
 }
