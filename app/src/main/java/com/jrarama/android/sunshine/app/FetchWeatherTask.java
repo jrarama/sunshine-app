@@ -65,7 +65,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
         // Students: First, check if the location with this city name exists in the db
         ContentResolver contentResolver = mContext.getContentResolver();
         Cursor cursor = contentResolver.query(LocationEntry.CONTENT_URI,
-                new String[] { LocationEntry._ID, LocationEntry.COLUMN_CITY_NAME },
+                new String[] { LocationEntry._ID },
                 LocationEntry.COLUMN_LOCATION_SETTING + " = ?",
                 new String[]{locationSetting},
                 null
@@ -84,6 +84,8 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
             Uri uri = contentResolver.insert(LocationEntry.CONTENT_URI, values);
             locationId = ContentUris.parseId(uri);
         }
+
+        cursor.close();
 
         // If it exists, return the current ID
         // Otherwise, insert it using the content resolver and the base URI
@@ -225,8 +227,8 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
             if ( cVVector.size() > 0 ) {
                 // Student: call bulkInsert to add the weatherEntries to the database here
                 ContentValues[] contentValues = new ContentValues[cVVector.size()];
-                contentValues = cVVector.toArray(contentValues);
-                inserted = mContext.getContentResolver().bulkInsert(LocationEntry.CONTENT_URI, contentValues);
+                cVVector.toArray(contentValues);
+                inserted = mContext.getContentResolver().bulkInsert(WeatherEntry.CONTENT_URI, contentValues);
             }
 
             Log.d(LOG_TAG, "FetchWeatherTask Complete. " + inserted + " Inserted");
@@ -305,11 +307,15 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
                 return null;
             }
             forecastJsonStr = buffer.toString();
+            getWeatherDataFromJson(forecastJsonStr, locationQuery);
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error ", e);
             // If the code didn't successfully get the weather data, there's no point in attempting
             // to parse it.
             return null;
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+            e.printStackTrace();
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -322,14 +328,6 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
                 }
             }
         }
-
-        try {
-            getWeatherDataFromJson(forecastJsonStr, locationQuery);
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
-            e.printStackTrace();
-        }
-        // This will only happen if there was an error getting or parsing the forecast.
         return null;
     }
 }
