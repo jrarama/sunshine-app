@@ -1,10 +1,8 @@
 package com.jrarama.android.sunshine.app;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -49,9 +47,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void showLocationMap() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String location = preferences.getString(getString(R.string.settings_location_key),
-                getString(R.string.settings_location_default));
+        String location = Utility.getPreferredLocation(this);
         Uri uri = Uri.parse("geo:0,0?q=" + location);
         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
 
