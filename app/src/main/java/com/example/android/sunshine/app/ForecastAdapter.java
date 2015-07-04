@@ -6,6 +6,7 @@ import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 /**
  * {@link ForecastAdapter} exposes a list of weather forecasts
@@ -56,8 +57,22 @@ public class ForecastAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         // our view is pretty simple here --- just a text view
         // we'll keep the UI functional with a simple (and slow!) binding.
+        boolean isMetric = Utility.isMetric(context);
 
-        //TextView tv = (TextView)view;
-        //tv.setText(convertCursorRowToUXFormat(cursor));
+        TextView dateView = (TextView)view.findViewById(R.id.list_item_date_textview);
+        String date = Utility.getFriendlyDayString(context, cursor.getLong(ForecastFragment.COL_WEATHER_DATE));
+        dateView.setText(date);
+
+        TextView forecastView = (TextView)view.findViewById(R.id.list_item_forecast_textview);
+        String forecast = cursor.getString(ForecastFragment.COL_WEATHER_DESC);
+        forecastView.setText(forecast);
+
+        TextView highView = (TextView)view.findViewById(R.id.list_item_high_textview);
+        String high = Utility.formatTemperature(cursor.getDouble(ForecastFragment.COL_WEATHER_MAX_TEMP), isMetric);
+        highView.setText(high);
+
+        TextView lowView = (TextView)view.findViewById(R.id.list_item_low_textview);
+        String low = Utility.formatTemperature(cursor.getDouble(ForecastFragment.COL_WEATHER_MIN_TEMP), isMetric);
+        lowView.setText(low);
     }
 }
