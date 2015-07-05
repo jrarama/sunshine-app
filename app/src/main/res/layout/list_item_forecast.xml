@@ -24,13 +24,11 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Tomorrow"
             android:id="@+id/list_item_date_textview"
             />
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Clear"
             android:id="@+id/list_item_forecast_textview"
             />
     </LinearLayout>
@@ -43,13 +41,11 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="21°"
             android:id="@+id/list_item_high_textview"
             android:layout_weight="0" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="8°"
             android:id="@+id/list_item_low_textview"
             />
 
