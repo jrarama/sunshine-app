@@ -133,7 +133,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         long dateInMillis = data.getLong(COL_WEATHER_DATE);
         ViewHolder viewHolder = new ViewHolder(getView());
 
-        String weatherId = data.getString(COL_WEATHER_CONDITION_ID);
+        int weatherId = data.getInt(COL_WEATHER_CONDITION_ID);
+        int image = Utility.getArtResourceForWeatherCondition(weatherId);
+        viewHolder.iconView.setImageResource(image);
+
         String dayName = Utility.getDayName(activity, dateInMillis);
         viewHolder.dayView.setText(dayName);
 
